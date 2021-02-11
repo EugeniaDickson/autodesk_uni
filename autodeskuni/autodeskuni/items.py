@@ -5,8 +5,14 @@
 
 import scrapy
 
-
 class AutodeskuniItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+    title = scrapy.Field()
+    description = scrapy.Field()
+    city = scrapy.Field()
+    year = scrapy.Field()
+    key_learnings = scrapy.Field()
+    tags_industry = scrapy.Field()
+    tags_topics = scrapy.Field()
+    recommend = scrapy.Field()
