@@ -25,9 +25,6 @@ class AutodeskSpider(Spider):
         for url in url_list:
             yield Request(url=url, callback=self.parse_presentations_page)
 
-            #https://www.autodesk.com/autodesk-university/au-online?facet_year%5B0%5D=2018&page=1
-            # https://www.autodesk.com/autodesk-university/au-online?facet_year%5B0%5D=2014&page=0
-
     def parse_presentations_page(self, response):
         url_list = response.xpath('//div[@class="result grid"]/a/@href').extract()
         url_list = ['https://www.autodesk.com/' + remaining for remaining in url_list]
@@ -61,7 +58,7 @@ class AutodeskSpider(Spider):
         tags_all = [tag.strip().lower() for tag in tags_all]
         tags_all = [tag for tag in tags_all if len(tag) != 0]
 
-        #all tags come in one list so the need to be split
+        #all tags come in one list so they need to be split
         #that's all possible groups but their combinations vary across all posts
         groups = ['product', 'industry', 'topics'] 
 
@@ -81,7 +78,7 @@ class AutodeskSpider(Spider):
         tags_industry = []
         tags_topics = []
 
-        #filling the group lists and converting them to strings delimited by pipe
+        #getting final lists of tags by group and converting them to strings delimited by pipe
         for lim in limits:
             temp = tags_all[lim[0]:lim[1]]
             name_temp = temp.pop(0)
@@ -91,8 +88,7 @@ class AutodeskSpider(Spider):
                 tags_industry = '|'.join(temp)
             elif name_temp == 'topics':
                 tags_topics = '|'.join(temp)
-
-        ### EXTRACTING NUMBER OF COMMENTS ###
+        
         item = AutodeskuniItem()
 
         item['city'] = city
