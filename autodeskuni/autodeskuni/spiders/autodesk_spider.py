@@ -25,14 +25,41 @@ class AutodeskSpider(Spider):
 
     def parse_description_page(self, response):
 
+        ### EXTRACTING CITY ###
         city_year = response.xpath('//*[@id="class-wrapper"]/div/div[1]/div[2]/div[1]/nav/div/a[1]/text()').extract_first()
-        title = response.xpath('//*[@id="class-wrapper"]/div/div[1]/div[2]/div[@class="au-content-banner__title"]/text()').extract_first() #remove \n's and strip
-        description = response.xpath('//*[@id="class__main"]/div[1]/div/div[1]/div/text()').extract_first() #remove \n's and strip
-        key_learnings = response.xpath('//*[@id="class__main"]/div[1]/div/div[2]/ul/li/text()').extract() #list
-        tags_industry = response.xpath('//*[@id="class__main"]/div[5]/div[1]/table/tbody/tr[2]/td[2]/a/').extract() #XXXXXXX
-        tags_topics = response.xpath('//*[@id="class__main"]/div[5]/div[1]/table/tbody/tr[3]/td[2]/a/text()').extract() #XXXXXXX
-        recommend = response.xpath('//*[@id="dh-1613089211663"]/div/p/span[2]/div/span/text()').extract_first() #check on another url with non 0 recommendations
+        city = city_year.split(' ')[0]
+        year = city_year.split(' ')[1]
 
+        ### EXTRACTING TITLE ###
+        title = response.xpath('//*[@id="class-wrapper"]/div/div[1]/div[2]/div[@class="au-content-banner__title"]/text()').extract_first().strip()
+
+        ### EXTRACTING DESCRIPTION ###
+        description = response.xpath('//*[@id="class__main"]/div[1]/div/div[1]/div/text()').extract_first().strip()
+
+        ### EXTRACTING KEY LEARNINGS ###
+        key_learnings = response.xpath('//*[@id="class__main"]/div[1]/div/div[2]/ul/li/text()').extract() #list
+
+        ### EXTRACTING TAGS ###
+        tags_all = response.xpath('//*[@id="class__main"]/div[5]/div[1]/table//text()').extract().strip()
+
+        #getting rid of extra spaces and empty strings
+        tags_all = [tag.strip().lower() for tag in tags_all]
+        tags_all = [tag for tag in tags_all if len(tag) != 0]
+
+        #splitting tags by groups
+        groups = ['product', 'industry', 'topics']
+
+        indexes= []
+        [indexes.append(tags_all.index(tag)) for tag in tags_all if tag in groups]
+
+        tags_product = tags_all[indexes[0]+1:indexes[1]]
+        tags_industry = tags_all[indexes[1]+1:indexes[2]]
+        tags_topics = tags_all[indexes[2]+1:]
+
+        ### EXTRACTING NUMBER OF PEOPLE WHO LIKED THE PRESENTATION ###
+        recommend = response.xpath('//div[@class="au-content-banner__bottom container container--dynamic"]//text()').extract() #unable to get any rec/comment data from the entire div
+
+        ### EXTRACTING NUMBER OF COMMENTS ###
         item['title'] = title
         item['description'] = description
         item['city'] = city
