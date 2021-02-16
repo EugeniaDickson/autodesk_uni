@@ -9,6 +9,8 @@ class AutodeskSpider(Spider):
 
     def parse(self, response):
         years = response.xpath('//*[@id="form1"]/div[6]/div//label/text()').extract()
+        #added 2020 since it was not showing in the sidebar
+        years.append('2020')
         years = sorted(years)
         
         url_list = [f"https://www.autodesk.com/autodesk-university/au-online?facet_year%5B0%5D={i}" for i in years]
